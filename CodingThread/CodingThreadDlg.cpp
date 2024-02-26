@@ -19,6 +19,14 @@ void CodingThreadDlg::Cls_OnClose(HWND hwnd)
 	EndDialog(hwnd, 0);
 
 }
+void CodingThreadDlg::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+	if (id == IDC_BUTTON1) {
+		ReleaseMutex(hMutex);
+		EndDialog(hwnd, 0);
+	}
+}
+
 
 DWORD WINAPI Coding_Thread(LPVOID lp)
 {
@@ -61,15 +69,15 @@ DWORD WINAPI OutThread(LPVOID lp)
 		MessageBox(ptr->hDialog, TEXT("Ошибка открытия файла!"), TEXT("Мьютекс"), MB_OK | MB_ICONINFORMATION);
 		return 1;
 	}
-	HANDLE hMutexOut = OpenMutex(MUTEX_ALL_ACCESS, false, TEXT("{B8A2C367-10FE-494d-A869-841B2AF972E0}"));
-	DWORD dwAnswer = WaitForSingleObject(hMutexOut, INFINITE);
+	HANDLE hMutex = OpenMutex(MUTEX_ALL_ACCESS, false, TEXT("{B8A2C367-10FE-494d-A869-841B2AF972E0}"));
+	DWORD dwAnswer = WaitForSingleObject(hMutex, INFINITE);
 	while (!in.eof())
 	{
 		getline(in,line);
 		SendMessageW(HWND(lp), LB_ADDSTRING, 0, LPARAM(line.c_str()));
 	}
 	in.close();
-	ReleaseMutex(hMutexOut); // освобождения мьютекса
+	ReleaseMutex(hMutex); // освобождения мьютекса
 	return 0;
 }
 
@@ -89,6 +97,7 @@ BOOL CALLBACK CodingThreadDlg::DlgProc(HWND hwnd, UINT message, WPARAM wParam, L
 	{
 		HANDLE_MSG(hwnd, WM_CLOSE, ptr->Cls_OnClose);
 		HANDLE_MSG(hwnd, WM_INITDIALOG, ptr->Cls_OnInitDialog);
+		HANDLE_MSG(hwnd, WM_COMMAND, ptr->Cls_OnCommand);
 	}
 	return FALSE;
 }

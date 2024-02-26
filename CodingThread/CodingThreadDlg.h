@@ -11,5 +11,6 @@ public:
 	static CodingThreadDlg* ptr;
 	void Cls_OnClose(HWND hwnd);
 	BOOL Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam);
+	void CodingThreadDlg::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify);
 	HWND hDialog,hList;
 };
